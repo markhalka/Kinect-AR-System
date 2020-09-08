@@ -14,805 +14,409 @@ public class Main : MonoBehaviour
 {
 
 
-
-
-
-        //3. fix the hand
-        //1. this is partially fixed in the first 2
-        //2. make the movment smaller (so it is less jittery)
-        //3. make sure that the hand only moves on 2 axis
-
-        //4. get the projection mapping working well
-        //1. try and get the wobble effect working well (that would be cool)
-
-
-
-
-    public Audio audio;
-    public Gesture gesture;
-    public Menu menu;
-
     public GameObject windowContainer;
     public GameObject windowList;
-    public static GameObject currentWindow = null;
+    public GameObject openObject;
 
-    
+    public static Window window; //must be public to allow windowClick to work
+    static SnapState snapState;
+    static modes currentMode;
+    static IotMenu menu;
+    static WindowMenu windowMenu;
+
+    LeftHand left;
+    RightHand right;
+    Audio audio;
+    Gesture gesture;
 
     void Start()
     {
-        Debug.LogError("here");
-      /*  Process[] processlist = Process.GetProcesses();
-        Debug.LogError(processlist.Length + " lenght");
-        foreach (Process process in processlist)
-        {
-            if (!string.IsNullOrEmpty(process.MainWindowTitle))
-            {
-                Debug.LogError("Process: " + process.ProcessName + " ID:  " + process.Id + "Window title: " + process.MainWindowTitle);
-            }
-        } */
-         CloseFirefoxWindow();
+        snapState = new SnapState();
+        window = new Window();
+        currentMode = modes.NONE;
+        menu = new IotMenu();
+        windowMenu = new WindowMenu(window, windowContainer, windowList, openObject);
+        left = new LeftHand();
+        right = new RightHand(handObject);
     }
 
-    #region minimizeWindows
-
-
-
-
-
-        public static void CloseFirefoxWindow()
-        {
-            string processName = "PaintDotNet";
-            CloseWindow(processName);
-        }
-
-
-        public static void CloseWindow(string processName)
-        {
-            Process[] processes = Process.GetProcessesByName(processName);
-        Debug.LogError(processes.Length + " length");
-            if (processes.Length > 0)
-            {
-                foreach (var process in processes)
-                {
-                    IDictionary<IntPtr, string> windows = List_Windows_By_PID(process.Id);
-                    foreach (KeyValuePair<IntPtr, string> pair in windows)
-                    {
-                        var placement = new WINDOWPLACEMENT();
-                        GetWindowPlacement(pair.Key, ref placement);
-
-                        if (placement.showCmd == SW_SHOWMINIMIZED)
-                        {
-                        Debug.LogError("maxamizing");
-                            //if minimized, show maximized
-                            ShowWindowAsync(pair.Key, SW_SHOWMAXIMIZED);
-                        }
-                        else
-                        {
-                        Debug.LogError("minimizing");
-                        //default to minimize
-                        ShowWindowAsync(pair.Key, SW_SHOWMINIMIZED);
-                        }
-                    }
-                }
-            }
-        }
-
-
-        private const int SW_SHOWNORMAL = 1;
-        private const int SW_SHOWMINIMIZED = 2;
-        private const int SW_SHOWMAXIMIZED = 3;
-
-        private struct WINDOWPLACEMENT
-        {
-            public int length;
-            public int flags;
-            public int showCmd;
-            public System.Drawing.Point ptMinPosition;
-            public System.Drawing.Point ptMaxPosition;
-            public System.Drawing.Rectangle rcNormalPosition;
-        }
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-
-        private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
-        [DllImport("USER32.DLL")]
-        private static extern bool EnumWindows(EnumWindowsProc enumFunc, int lParam);
-
-        [DllImport("USER32.DLL")]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
-
-        [DllImport("USER32.DLL")]
-        private static extern int GetWindowTextLength(IntPtr hWnd);
-
-        [DllImport("USER32.DLL")]
-        private static extern bool IsWindowVisible(IntPtr hWnd);
-
-        [DllImport("USER32.DLL")]
-        private static extern IntPtr GetShellWindow();
-
-        [DllImport("USER32.DLL")]
-        private static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
-
-
-    public static IDictionary<IntPtr, string> List_Windows_By_PID(int processID)
+    public void Update()
     {
-        IntPtr hShellWindow = GetShellWindow();
-        Dictionary<IntPtr, string> dictWindows = new Dictionary<IntPtr, string>();
-
-        EnumWindows(delegate (IntPtr hWnd, int lParam)
-        {
-                //ignore the shell window
-                if (hWnd == hShellWindow)
-            {
-                return true;
-            }
-
-                //ignore non-visible windows
-                if (!IsWindowVisible(hWnd))
-            {
-                return true;
-            }
-
-                //ignore windows with no text
-                int length = GetWindowTextLength(hWnd);
-            if (length == 0)
-            {
-                return true;
-            }
-
-            uint windowPid;
-            GetWindowThreadProcessId(hWnd, out windowPid);
-
-                //ignore windows from a different process
-                if (windowPid != processID)
-            {
-                return true;
-            }
-
-            StringBuilder stringBuilder = new StringBuilder(length);
-            GetWindowText(hWnd, stringBuilder, length + 1);
-            dictWindows.Add(hWnd, stringBuilder.ToString());
-
-            return true;
-
-        }, 0);
-
-        return dictWindows;
-    }
-    
-
-#endregion
-
-IEnumerator initWindows()
-    {
-        yield return new WaitForSeconds(1);//WaitForEndOfFrame();
-        foreach(var b in openObject.GetComponentsInChildren<Button>())
-        {
-            b.onClick.AddListener(delegate { StartCoroutine(takeAdd()); });
-        }
-       /* Transform curr = openObject.transform.GetChild(0).GetChild(0).GetChild(0);
-        for(int i = 0; i < curr.childCount; i++)
-        {
-            Debug.LogError("added something");
-            curr.GetChild(i).GetComponentInChildren<Button>().onClick.AddListener(delegate { takeAdd(); });
-        } */
-    }
-
-    IEnumerator takeAdd()
-    {
-        yield return new WaitForSeconds(1);//WaitForEndOfFrame();
-
-        if (windowContainer.transform.childCount == 0)
-            yield break;
-
-        currentWindow = windowContainer.transform.GetChild(windowContainer.transform.childCount-1).gameObject;
-        Debug.LogError(currentWindow.name + " is the current selected window");
-        closeMenu();
-
-    }
-
-    void click3D()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (UnityEngine.Physics.Raycast(ray, out hit))
-            {
-
-                for (int i = 0; i < windowContainer.transform.childCount; i++)
-                {
-                    if (windowContainer.transform.GetChild(i).name == hit.transform.gameObject.name)
-                    {
-
-                        currentWindow = windowContainer.transform.GetChild(i).gameObject;
-                        Debug.LogError("selected: " + currentWindow.name + "!");
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    Vector2 windowVec = new Vector2(0, 0);
-    Vector2 nullVector = new Vector2(0, 0);
-    void Update()
-    { 
-
-      
-        handleKeyboardInput();
         handleGestures();
-  
+        checkResizing();
         
-      //  click3D();
-    }
-
-    public Canvas canvas;
-    public Vector3 mousePosition()
-    {
-        /*   Vector3 pos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1);
-           Vector2 tempOut = new Vector2(0, 0);
-
-           RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.GetComponent<RectTransform>(), Input.mousePosition, Camera.main, out tempOut);
-           return tempOut;*/
-
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = Camera.main.nearClipPlane;
-        return Camera.main.ScreenToWorldPoint(mousePos);
-    }
-
-
-
-
-    //ok, now you need to be able to move windows around, and select the right ones
-    //to select, you need the position and orentiation of your hand
-
-    //test the position and orientation of hand object, and raycasting 
-
-
-    //test selecting a window 
-    //test deleting the window
-
-
-
-    //than you need to make the submenu shit, and get all that working
-
-    //than you need to add better gestures
-
-    //ok, so for the updating position, instead of having absolute values, just add the delta
-    //if the delta is 0 for a long time, rest the object to have 0,0 position and no rotation 
-
-    //when creating the window, select which one you want just by moving your hand up or down 
-
-    //then when it is created, move the window to 0,0, and move it based on the delta of the position of the users hand
-
-    //then fist wil deselect the current menu
-
-    //ok, what you can do instead is just have a 2d dot on the screen, which is moved by the position of the hand (leave the rotation for now)
-
-    //ok, so here what you need to do next
-
-
-    //3. add the sub menus
-    //4. begin making the gestures better
-
-    //the system activates / deactivates when you snap (to keep it from constatnly looking for gestures)
-
-
-    //try this out with the projector 
-    //start adding some effects as well (try and get wobble to work)
-    //
-
-
-    //todo:
-    
-    //3. redo the calulations for the circle in left menu
-
-        //to make the windows 
-
-        //ok, so when a window is selected, have a command that sets it into interactable mode
-
-
-   //ok, so now todo:
-   //1. find the pid of all the windows shown in that list
-   //2. if they are selected, make sure they are maximized
-   //3. 
-
-
-     
-       
-
-
-        //ok, keep the timeout, just have one hand that you keep track of, and just make sure that for certain gestuers the same one doesnt appear twice 
-
-
-
-
-    int gestureTimeout = 60;
-    int gestureCountLeft = 0;
-    int gestureCountRight = 0;
-
-    string lastLeft = "";
-    string lastRight = "";
-
-    bool selectMode = false;
-    bool menuMode = false;
-    bool wasResizing = false;
-    public float snapTime = 0;
-    public bool detectedSnap = false;
-    public float snapThresh = 2;
-
-    bool canLeft = true;
-    bool canRight = true;
-
-    public void handleGestures()
-    {
-        if (audio.didSnap())
+        if (currentMode == modes.RESIZING)
         {
-            detectedSnap = true;
-            snapTime = 0;
-        }
-
-        if (detectedSnap)
-        {
-            snapTime += Time.deltaTime;
-           
-            if(snapTime > snapThresh)
-            {
-                detectedSnap = false;
-                snapTime = 0;
-            }
-        }
-        string left = gesture.leftHandState;
-        string right = gesture.rightHandState;
-
-        var posLeft = gesture.posLeft;
-        var posright = gesture.posRight;
-        var rightVec = new Vector3(posright.X, posright.Y, posright.Z);
-        var leftVec = new Vector3(posLeft.X, posLeft.Y, posLeft.Z);
-        var rotRight = gesture.rotRight;
-
-        if (left == "Closed" && right == "Closed") //than you can resize the window
-        {
-            Debug.LogError("resizing");
-            resizeWindow(10 * Vector3.Distance(rightVec, leftVec));
-            wasResizing = true;
             return;
-        }
-        else
+        } else if (currentMode == modes.SELECT)
         {
-            if (wasResizing)
-            {
-                gestureCountLeft = 0;
-                lastLeft = left;
-                
-                wasResizing = false;
-            }
-        }
-
-        if (selectMode)
+            updateHandObject(right.position);
+        } else if (currentMode == modes.MENU)
         {
-            updateHandObject(rightVec, new Quaternion(rotRight.X, rotRight.Y, rotRight.Z, rotRight.W));
+            windowMenu.updateMenu(right.position);
         }
-
-        if (menuMode)
-        {
-            updateMenu(rightVec);
-        }
-
 
         if (menu.isMenuOpen)
         {
-            menu.calculateDirection(leftVec);
+            menu.updateMenu(left.position);
         }
 
-        if (currentWindow != null)
+        if (window.currentWindow != null)
         {
-            Debug.LogError("moving window...");
-            moveWindow(rightVec);
-            
+            window.moveWindow(right.position);
+        }       
+
+        right.updatePrevious();
+        right.updateFist();
+        right.updateLasso();
+
+        left.updatePrevious();
+        left.updateLasso();
+        left.updateFist();
+    }
+
+    class Hand
+    {
+        public int GESTURE_TIMEOUT = 60;
+        public string lastState 
+        { get; set; }
+        public string currentState
+        { get; set; }
+        public Vector3 position
+        { get; set; }
+        public Vector3 lastPosition
+        { get; set; }
+        public bool canMove
+        { get; set; }
+        public int count
+        { get; set; }
+
+        public Hand()
+        {
+            canMove = true;
+            position = new Vector3(0, 0);
+            currentState = "";
+            lastState = "";
+            count = 0;
         }
 
-        if (left == lastLeft || left == "Unkown" && gestureCountLeft < gestureTimeout)
+        public void updateState()
         {
-            
-            gestureCountLeft++;
-            canLeft = false;
-        } else
-        {
-            lastLeft = "";
-            canLeft = true;
+            lastState = currentState;
+            count = 0;
         }
 
-        if (right == lastRight || right == "Unkown" && gestureCountRight < gestureTimeout)
+        public void updatePrevious()
         {
-            gestureCountRight++;
-            canRight = false;
-        }
-        else
-        {
-            lastRight = "";
-            canRight = true;
-        }
-
-        if (left == "Lasso" && canLeft)
-        {
-            if (menu.isMenuOpen)
+            if (currentState == lastState || currentState == "Unkown" && count < GESTURE_TIMEOUT)
             {
-                menu.selectOption();
-
-                lastLeft = left;
-                gestureCountLeft = 0;          
-            }                
-        }
-
-        if (right == "Lasso" && canRight)
-        {
-            Debug.LogError("right lasso");
-            if (menuMode && currentWindow == null)
-            {
-                Debug.LogError("selected option");
-                selectMenuOption();
-                menuMode = false;
-
-                lastRight = right;
-                gestureCountRight = 0;
-             
-                return;
-            } else
-            {
-                if (selectMode == false)
-                {
-                    selectMode = true;
-
-                    lastRight = right;
-                    gestureCountRight = 0;
-                } else
-                {
-                    if(currentWindow == null)
-                    {
-                        checkSelect();
-                    } else
-                    {
-                        handObject.SetActive(false);
-                        selectMode = false;
-
-                        lastRight = right;
-                        gestureCountRight = 0;
-
-                    }    
-                }              
-            } 
-        }
-
-    
-      
-        if(left == "Closed" && currentWindow == null && canLeft)
-        {
-            
-            if (detectedSnap)
-            {
-                if (!menu.isMenuOpen)
-                {
-                    Debug.LogError("opening menu");
-                    menu.openHomeMenu();
-                }
-                else
-                {
-                    Debug.LogError("closing window");
-                    menu.closeMenu();
-                }
-
-                lastLeft = left;
-                gestureCountLeft = 0;
-            }     
-        }  
-
-        if (right == "Closed" && canRight)
-        {
-            
-            if (selectMode)
-            {
-                if(currentWindow != null)
-                {
-                    destroyWindow(currentWindow);
-                }
-                handObject.SetActive(false);
-                selectMode = false;
-
-                lastRight = right;
-                gestureCountRight = 0;
-                return;
+                count++;
+                canMove = false;
             }
-            
-            if (lastRight != "Closed")
+            else
             {
-                if (currentWindow != null)
+                lastState = "";
+                canMove = true;
+            }
+        }
+
+        public void updateLasso() { }
+        public void updateFist() { }
+
+    }
+    class LeftHand : Hand
+    {
+
+        public void updateLasso()
+        {
+            if (currentState == "Lasso" && canMove)
+            {
+                if (menu.isMenuOpen)
                 {
-                    currentWindow = null;
-                   // Debug.LogError("would close window");
-                    //destroyWindow(currentWindow); //close the current window
+                    menu.selectOption();
+                    updateState();
                 }
-                else
+            }
+        }
+
+        public void updateFist()
+        {
+            if (currentState == "Closed" && window.currentWindow == null && canMove)
+            {
+
+                if (snapState.detectedSnap)
                 {
-                    if (openObject.activeSelf)
+                    if (!menu.isMenuOpen)
                     {
-                        closeMenu();
+                        Debug.LogError("opening menu");
+                        menu.openHomeMenu();
                     }
                     else
                     {
-                        Debug.LogError("created window menu again");
-                        createWindow();
+                        Debug.LogError("closing window");
+                        menu.closeMenu();
+                    }
+                    updateState();
+                }
+            }
+        }
+    }
+    class RightHand : Hand
+    {
+        GameObject RightHandObject;
+        public RightHand(GameObject HandObjectRef)
+        {
+            RightHandObject = HandObjectRef;
+        }
+        public void updateLasso()
+        {
+            if (currentState == "Lasso" && canMove)
+            {
+                if (currentMode == modes.MENU && window.currentWindow == null)
+                {
+                    windowMenu.selectMenuOption();
+                    currentMode = modes.NONE;
+                    updateState();
+                    return;
+                }
+                else
+                {
+                    if (currentMode != modes.SELECT)
+                    {
+                        currentMode = modes.SELECT;
+                        updateState();
+                    }
+                    else
+                    {
+                        if (window.currentWindow == null)
+                        {
+                            window.selectWindow();
+                        }
+                        else
+                        {
+                            RightHandObject.SetActive(false);
+                            currentMode = modes.NONE;
+                            updateState();
+                        }
                     }
                 }
+            }
+        }
 
-                lastRight = right;
-                gestureCountRight = 0;
-            }         
+        public void updateFist()
+        {
+            if (currentState == "Closed" && canMove)
+            {
+
+                if (currentMode == modes.SELECT)
+                {
+                    window.destroyWindow(window.currentWindow);
+                    currentMode = modes.NONE;
+                    updateState();
+                    return;
+                }
+
+                if (lastState != "Closed")
+                {
+                    windowMenu.cancelMenu();
+                    updateState();
+                }
+            }
+        }
+    }
+    class SnapState
+    {
+        public float SNAP_THRESH = 2;
+        public float snapTime
+        { get; set; }
+
+        public bool detectedSnap
+        { get; set; }
+
+        public SnapState()
+        {
+            snapTime = 0;
+            detectedSnap = false;
+        }
+    }
+    enum modes { MENU, SELECT, RESIZING, NONE}
+    class WindowMenu : MonoBehaviour
+    {
+        Window window;
+        GameObject windowContainer;
+        GameObject windowList;
+        GameObject openObject;
+
+        Vector3 pastMenuPosition = new Vector3(0, 0);
+        float minDistanceY = 0.1f;
+        int menuIndex = 0;
+        float currentMenuY = 0;
+
+        public WindowMenu(Window windowRef, GameObject windowContainerRef, GameObject windowListRef, GameObject openObjectRef)
+        {
+            window = windowRef;
+            windowContainer = windowContainerRef;
+            windowList = windowListRef;
+            openObject = openObjectRef;
+        }
+
+        public void cancelMenu()
+        {
+            if (window.currentWindow != null)
+            {
+                window.currentWindow = null;
+            }
+            else
+            {
+                if (openObject.activeSelf)
+                {
+                    closeMenu();
+                }
+                else
+                {
+                    createWindow();
+                }
+            }
+        }
+        void closeMenu()
+        {
+            pastMenuPosition = new Vector3(0, 0);
+            currentMode = modes.NONE;
+            currentMenuY = 0;
+            openObject.SetActive(false);
+        }
+        public void updateMenu(Vector3 position)
+        {
+            if (pastMenuPosition == new Vector3(0, 0))
+            {
+                pastMenuPosition = position;
+                return;
+            }
+
+            var delta = pastMenuPosition.y - position.y;
+            if (Mathf.Abs(delta) < minDistanceY)
+            {
+                return;
+            }
+
+            currentMenuY += delta;
+
+            windowList.transform.GetChild(menuIndex).GetComponent<Image>().color = new Color32(0, 0, 0, 100);
+            menuIndex = (int)(windowList.transform.childCount * delta * 2); //not -1 becasue the first one is the default shit 
+
+
+            if (menuIndex < 0)
+            {
+                menuIndex = 0;
+            }
+
+            if (menuIndex >= windowList.transform.childCount)
+            {
+                menuIndex = windowList.transform.childCount - 1;
+            }
+
+            windowList.transform.GetChild(menuIndex).GetComponent<Image>().color = new Color(1, 0, 0, 1);
+        }
+
+        public void selectMenuOption()
+        {
+            windowList.transform.GetChild(menuIndex).GetComponent<Button>().onClick.Invoke();
+        }
+        public void createWindow()
+        {
+            currentMode = modes.MENU;
+            openObject.SetActive(true);
+            StartCoroutine(initWindows());
+        }
+        IEnumerator initWindows()
+        {
+            yield return new WaitForSeconds(1);//WaitForEndOfFrame();
+            foreach (var b in openObject.GetComponentsInChildren<Button>())
+            {
+                b.onClick.AddListener(delegate { StartCoroutine(takeAdd()); });
+            }
+        }
+        IEnumerator takeAdd()
+        {
+            yield return new WaitForSeconds(1);//WaitForEndOfFrame();
+            if (windowContainer.transform.childCount == 0)
+                yield break;
+
+            window.currentWindow = windowContainer.transform.GetChild(windowContainer.transform.childCount - 1).gameObject;
+            closeMenu();
         }
     }
 
-    void selectMenuOption()
+    public void checkSnap()
     {
-     
-        windowList.transform.GetChild(menuIndex).GetComponent<Button>().onClick.Invoke();
-        
-    }
-
-    void closeMenu()
-    {
-        pastMenuPosition = new Vector3(0, 0);
-        menuMode = false;
-        currentMenuY = 0;
-        openObject.SetActive(false);
-    }
-
-    //here, depending on if the hand is going up or down, just select different things 
-    Vector3 pastMenuPosition = new Vector3(0, 0);
-    float minDistanceY = 0.1f;
-    int menuIndex = 0;
-    float currentMenuY = 0;
-    void updateMenu(Vector3 position)
-    {
-        if(pastMenuPosition == new Vector3(0, 0))
+        if (audio.didSnap())
         {
-            pastMenuPosition = position;
-            return;
-        }
- 
-        var delta = pastMenuPosition.y - position.y;
-        if(Mathf.Abs(delta) < minDistanceY)
-        {
-            return;
+            snapState.detectedSnap = true;
+            snapState.snapTime = 0;
         }
 
-        currentMenuY += delta;
-
-        windowList.transform.GetChild(menuIndex).GetComponent<Image>().color = new Color32(0, 0, 0, 100);
-        menuIndex = (int)(windowList.transform.childCount * delta * 2); //not -1 becasue the first one is the default shit 
-
-
-        if (menuIndex < 0)
+        if (snapState.detectedSnap)
         {
-            menuIndex = 0;
+            snapState.snapTime += Time.deltaTime;
+
+            if (snapState.snapTime > snapState.SNAP_THRESH)
+            {
+                snapState.detectedSnap = false;
+                snapState.snapTime = 0;
+            }
         }
+    }
 
-        if(menuIndex >= windowList.transform.childCount)
+    bool checkResizing()
+    {
+        if (left.currentState == "Closed" && right.currentState == "Closed") //than you can resize the window
         {
-            menuIndex = windowList.transform.childCount - 1;
-        }
-
-        Debug.LogError(menuIndex + " current menu index");
-
-
-        windowList.transform.GetChild(menuIndex).GetComponent<Image>().color = new Color(1, 0, 0, 1);
-
-    }
-
-    void startSelectMode()
-    {
-        selectMode = true;
-        //hide everything else
-        
-    }
-
-    void endSelectMode()
-    {
-        selectMode = false;
-        currentWindow.GetComponent<Image>().color = new Color32(0, 0, 0, 100);
-    }
-
-    void selectWindow(GameObject curr)
-    {
-        if(curr.GetComponent<Image>() != null)
-        curr.GetComponent<Image>().color = new Color(1, 0, 0, 1);
-        currentWindow = curr;
-    }
-
-    public GameObject handObject;
-    Vector3 previousPosition;
-    Vector3 previousRotation;
-    float minPosChange = 0.05f;
-    float minRotChange = 10;
-    float maxRotChange = 90; //to stop the annoying axis flipping 
-    int minThresh = 50;
-    int minCount = 0;
-    float speed = 10;
-    float handSens = 2.5f;
-    public void updateHandObject(Vector3 position, Quaternion rotation)
-    {
-        if (!handObject.activeSelf)
-        {
-
-            handObject.SetActive(true);
-            handObject.transform.position = new Vector3(0, 0, 0);
-            previousPosition = position;
-            return;
-        }
-        /*  if(minCount > minThresh)
-          {
-              //reset position
-              handObject.transform.position = new Vector3(0, 0, 0);
-              handObject.transform.rotation = Quaternion.Euler(0, 0, 0);
-              minCount = 0;
-              return;
-          }
-          if(Vector3.Distance(position, handObject.transform.position) < minPosChange)
-          {
-              minCount++;
-              return;
-          }
-          var currRot = rotation.eulerAngles;
-          var change = Vector3.Distance(previousRotation, currRot);
-          if (change < minRotChange || change > maxRotChange)
-          {
-              minCount++;
-              return;
-          }
-
-        var currRot = rotation.eulerAngles;
-        var change = Vector3.Distance(previousRotation, currRot);
-        */
-        
-       // handObject.transform.Translate((previousPosition - position) * speed * handSens);
-        handObject.transform.position += new Vector3((-previousPosition.x + position.x) * speed * handSens, (-previousPosition.y + position.y) * speed * handSens, 0);//(handObject.transform.position.x, handObject.transform.position.y, 0); 
-        handObject.transform.position = new Vector3(handObject.transform.position.x, handObject.transform.position.y, 0);
-
-        // handObject.transform.Rotate(previousRotation - currRot);
-
-        //   previousRotation = currRot;
-        previousPosition = position;
-        
-    }
-    public void checkSelect()
-    {
-        RaycastHit hit;
-        // Does the ray intersect any objects excluding the player layer
-        if (Physics.Raycast(handObject.transform.position, handObject.transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity))
-        {
-            Debug.DrawRay(handObject.transform.position, handObject.transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow);
-            selectWindow(hit.collider.gameObject);
+            window.resizeWindow(10 * Vector3.Distance(right.position, left.position));
+            return true;
         }
         else
         {
-            Debug.DrawRay(handObject.transform.position, handObject.transform.TransformDirection(Vector3.down) * 1000, Color.white);
-            Debug.Log("Did not Hit");
+            if (currentMode == modes.RESIZING)
+            {
+                left.updateState();
+            }
         }
+        return false;
     }
 
 
-    public void handleKeyboardInput()
+    private void handleGestures()
     {
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            createWindow();
-        }
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            moveWindow(new Vector2(50,50));
-        }
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            destroyWindow(currentWindow);
-        }
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            resizeWindow(-0.5f);
-        }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            resizeWindow(0.5f);
-        }
+        checkSnap();
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            scrollWindow(1);
-        }
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            scrollWindow(-1);
-        }
+        left.currentState = gesture.LeftHandState;
+        right.currentState = gesture.RightHandState;
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            currentWindow = null;
-        }
+        var posLeft = gesture.PosLeft;
+        var posright = gesture.PosRight;
+
+        right.position = new Vector3(posright.X, posright.Y, posright.Z);
+        left.position = new Vector3(posLeft.X, posLeft.Y, posLeft.Z);
     }
 
 
-    public GameObject openObject;
-    public void createWindow()
+    public GameObject handObject;
+    float speed = 10;
+    float handSens = 2.5f;
+    public void updateHandObject(Vector3 position)
     {
-        menuMode = true;
-        openObject.SetActive(true);
-        StartCoroutine(initWindows());
-    }
-
-    public void updateWindowPosition()
-    {
-        if (currentWindow != null)
+        if (!handObject.activeSelf)
         {
-           // currentWindow.transform.localPosition = mousePosition();
-        }  
-    }
-
-    public void destroyWindow(GameObject window)
-    {
-        if (window == currentWindow)
-        {
-            currentWindow = null;
-        }
-            Destroy(window);
-    }
-
-    float previous = 0;
-
-    public void resizeWindow(float current)
-    {
-        if (currentWindow == null)
+            handObject.SetActive(true);
+            handObject.transform.position = new Vector3(0, 0, 0);
+            right.lastPosition = position;
             return;
+        }    
+        
+        handObject.transform.position += new Vector3((-right.lastPosition.x + position.x) * speed * handSens, (-right.lastPosition.y + position.y) * speed * handSens, 0);//(handObject.transform.position.x, handObject.transform.position.y, 0); 
+        handObject.transform.position = new Vector3(handObject.transform.position.x, handObject.transform.position.y, 0);
 
-        if (previous == 0)
-            previous = current;
-
-        float delta = previous - current;
-      
-        currentWindow.GetComponent<uWindowCapture.UwcWindowTexture>().scalePer1000Pixel -= delta;
-
-        previous = current;
+        right.lastPosition = position;
+        
     }
-
-    Vector3 previousHand = new Vector3(0, 0, 0);
-    public void moveWindow(Vector3 current)
-    {
-        if (currentWindow == null)
-            return;
-
-        if(previousHand == new Vector3(0, 0, 0))
-        {
-            previousHand = current;
-        }
-
-        Vector3 delta = previousHand - current;
-
-        currentWindow.transform.Translate(-delta.x * 50, -delta.y * 50, 0);
-   
-
-        previousHand = current;
-    }
-
-    public void scrollWindow(int direction)
-    {
-
-    }
-
-
-
 }
