@@ -302,7 +302,7 @@ public class Main : MonoBehaviour
             currentMenuY += delta;
 
             windowList.transform.GetChild(menuIndex).GetComponent<Image>().color = new Color32(0, 0, 0, 100);
-            menuIndex = (int)(windowList.transform.childCount * delta * 2); //not -1 becasue the first one is the default shit 
+            menuIndex = (int)(windowList.transform.childCount * delta * 2); 
 
 
             if (menuIndex < 0)

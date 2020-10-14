@@ -7,6 +7,13 @@ using System;
 using System.Globalization;
 
 
+// todo for this shit:
+//1. read throught all iot menu stuff, and look at the hand gesture code, make sure it works as intended
+//2. read throught the hand gesture code again (why not)
+//3. double check the window interactions, especially movment, resizing and selecting, fix the code there 
+//4. maybe take a look at making it voice controlled, import ibm watson, have speech to text, add keywords done 
+
+
 public class IotMenu : MonoBehaviour
 {
 
