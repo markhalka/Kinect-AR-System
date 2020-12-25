@@ -124,18 +124,25 @@
     <Compile Include="Assets\RoomAliveToolkit\Scripts\Utilities\UnityUtilities.cs" />
     <Compile Include="Assets\RoomAliveToolkit\Scripts\Utilities\UnmanagedImage.cs" />
     <Compile Include="Assets\RoomAliveToolkit\Scripts\Utilities\Win32.cs" />
-    <Compile Include="Assets\Scripts\Audio.cs" />
+    <Compile Include="Assets\Scripts\Audio\Audio.cs" />
+    <Compile Include="Assets\Scripts\Audio\AudioCommand.cs" />
+    <Compile Include="Assets\Scripts\Audio\CommandHandler.cs" />
+    <Compile Include="Assets\Scripts\Audio\SnapState.cs" />
     <Compile Include="Assets\Scripts\ButtonClick.cs" />
     <Compile Include="Assets\Scripts\Gestures\DetectJoints.cs" />
     <Compile Include="Assets\Scripts\Gestures\Gesture.cs" />
     <Compile Include="Assets\Scripts\Gestures\Hand.cs" />
+    <Compile Include="Assets\Scripts\Gestures\HandStates.cs" />
     <Compile Include="Assets\Scripts\Gestures\LeftHand.cs" />
     <Compile Include="Assets\Scripts\Gestures\RightHand.cs" />
+    <Compile Include="Assets\Scripts\Gestures\SwipingGesture.cs" />
+    <Compile Include="Assets\Scripts\HandObject.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Circle.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Effects\CreateEffects.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Effects\EditEffects.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Effects\Effects.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Effects\SelectEffects.cs" />
+    <Compile Include="Assets\Scripts\IotMenu\Home\Home.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Iot\Door.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Iot\IOT.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Iot\IOTDevice.cs" />
@@ -146,17 +153,24 @@
     <Compile Include="Assets\Scripts\IotMenu\Iot\SelectRoom.cs" />
     <Compile Include="Assets\Scripts\IotMenu\IotMenu.cs" />
     <Compile Include="Assets\Scripts\IotMenu\MenuOption.cs" />
-    <Compile Include="Assets\Scripts\IotMenu\Security\Camera.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Security\CameraSettings.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Security\EditCameras.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Security\Recording.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Security\Recordings.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Security\Security.cs" />
+    <Compile Include="Assets\Scripts\IotMenu\Security\SecurityCamera.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Security\ViewCameras.cs" />
+    <Compile Include="Assets\Scripts\IotMenu\Settings\Brightness.cs" />
+    <Compile Include="Assets\Scripts\IotMenu\Settings\DeviceInfo.cs" />
+    <Compile Include="Assets\Scripts\IotMenu\Settings\GestureSettings.cs" />
+    <Compile Include="Assets\Scripts\IotMenu\Settings\Recalibration.cs" />
     <Compile Include="Assets\Scripts\IotMenu\Settings\Settings.cs" />
     <Compile Include="Assets\Scripts\Main.cs" />
-    <Compile Include="Assets\Scripts\Window.cs" />
-    <Compile Include="Assets\Scripts\windowClick.cs" />
+    <Compile Include="Assets\Scripts\mode.cs" />
+    <Compile Include="Assets\Scripts\Windows\Window.cs" />
+    <Compile Include="Assets\Scripts\Windows\windowClick.cs" />
+    <Compile Include="Assets\Scripts\Windows\WindowManager.cs" />
+    <Compile Include="Assets\Scripts\Windows\WindowMenu.cs" />
     <Compile Include="Assets\uWindowCapture\Examples\Window List\UwcWindowList.cs" />
     <Compile Include="Assets\uWindowCapture\Examples\Window List\UwcWindowListItem.cs" />
     <Compile Include="Assets\uWindowCapture\Scripts\UwcAltTabWindowTextureManager.cs" />
@@ -175,6 +189,7 @@
     <None Include="Assets\RoomAliveToolkit\Shaders\ProjectionMappingMinimal.shader" />
     <None Include="Assets\RoomAliveToolkit_Examples\calibration1x1\officeTest.xml" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\SpeechSDK\REDIST.txt" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\RoomAliveToolkit\Shaders\DepthMeshProcessing.cginc" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
@@ -404,6 +419,9 @@
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>C:/Program Files/2019.1.6f1/Editor/Data/UnityExtensions/Unity/TestRunner/net35/unity-custom/nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CognitiveServices.Speech.csharp">
+      <HintPath>C:/Users/pc/Desktop/projects/Project-tron/Assets/SpeechSDK/Plugins/x86_64/Microsoft.CognitiveServices.Speech.csharp.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>C:/Users/pc/Desktop/projects/Project-tron/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>

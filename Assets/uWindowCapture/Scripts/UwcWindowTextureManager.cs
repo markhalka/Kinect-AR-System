@@ -49,6 +49,10 @@ public class UwcWindowTextureManager : MonoBehaviour
                 windows_.Add(window.id, windowTexture);
 
             }
+
+            var windowScript = obj.GetComponent<Window>();
+            windowScript.setProcessId(window.processId);
+            windowScript.setSafeMode(WindowManager.safeMode);
      
         onWindowTextureAdded.Invoke(windowTexture);
 

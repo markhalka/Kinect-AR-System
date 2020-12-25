@@ -23,11 +23,16 @@ public class IotMenu : MonoBehaviour
     public Circle circle;
 
     RadialMenu script;
+    MenuOption home;
     void Start()
     {
         script = menuContainer.GetComponent<RadialMenu>();
         buttonCall = "";
         isMenuOpen = false;
+        circle = new Circle();
+        home = new Home();
+        currentOption = home;
+        getSubMenuNames(home);
     }
 
     void Update()
@@ -41,87 +46,57 @@ public class IotMenu : MonoBehaviour
     }
 
 
-    public enum menus {Home, Security, IOT, Settings, Effects };
-    public menus currentMenu;
+    //  public enum menus {Home, Security, IOT, Settings, Effects };
+    //  public menus currentMenu;
+
+    //ok, so instead button call will invoke the current handle method on the current menu, and then that will decide the next option
+
+    MenuOption currentOption;
     public void handleMenuUpdate(string menuName)
     {
-        switch (currentMenu)
+        currentOption = getOptionFromName(menuName);
+        var options = getSubMenuNames(currentOption);
+        if(options.Length == 0)
         {
-            case menus.Home:
-                switch (menuName)
-                {
-                    case "Security":
-                        openMenu("Security", new string[] { "View Cameras", "Edit Cameras", "Settings", "Recordings" });
-                        break;
-                    case "IOT":
-                        openMenu("IOT", new string[] { "Lights", "Door", "Windows", "Blinds", "Select Room", "Edit Devices", "Settings" });
-                        break;
-                    case "Settings":
-                        openMenu("IOT", new string[] { "Brightness", "Sensor recalibration", "Device info", "Computer Synching", "Gesture settings" });
-                        break;
-                    case "Effects":
-                        openMenu("IOT", new string[] { "Edit Effects", "Select Effects", "Create Effects" });
-                        break;
-                }
-                break;
-              
-            case menus.Security:
-                switch (menuName)
-                {
-                    case "View Cameras":
-                        break;
-                    case "Settings":
-                        openMenu("Camera Settings", new string[] { "Add Camera", "Enable All", "Disable All" });
-                        break;
-                    case "Recordings":
-                        break;
-                }
-                break;
-        
-            case menus.IOT:
-                switch (menuName)
-                {
-                    case "Select Room": //just a list of the rooms (if there is more than 8, than there is a button that says more, which shows the rest of the rooms)
-                        break;
-                    case "Edit Devices": 
-                        break;
-                    case "Settings":
-                        break;
-                }
-                break;
-            case menus.Settings:
-                switch (menuName)
-                {
-                    case "Brightness":
-                        break;
-                    case "Sensor recalibration":
-                        break;
-                    case "Device info": 
-                        break;
-                    case "Computer Synching":
-                        break;
-                    case "Gesture settings":
-                        break;
-                }
-                break;
-            case menus.Effects:
-                switch (menuName)
-                { 
-                    case "View Effects":
-                        break;
-                    case "Create Effects":
-                        break;
-                }
-                break;
+            currentOption.handle();
+            return;
         }
+
+        openMenu(currentOption.name, options);
     }
 
 
+    public string[] getSubMenuNames(MenuOption thing)
+    {
+        List<string> output = new List<string>();
+        if(thing.submenus == null)
+        {
+            return new string[0];
+        }
+        for(int i = 0; i < thing.submenus.Count; i++)
+        {
+            output.Add(thing.submenus[i].name);
+        }
+        return output.ToArray();
+    }
 
+    public MenuOption getOptionFromName(string name)
+    {
+        foreach(MenuOption option in currentOption.submenus)
+        {
+            if (option.name == name)
+            {
+                return option;
+            }
+        }
+        return null;
+    }
 
     public void openHomeMenu()
     {
-        openMenu("Home", new string[] { "Security", "IOT", "Settings", "Effects" });
+        mode.currentMode = modes.IOT_MENU;
+        currentOption = home;
+        openMenu(home.name, getSubMenuNames(home));
     }
 
     public void openMenu(string name, string[] values)
@@ -161,6 +136,7 @@ public class IotMenu : MonoBehaviour
     //closes the current menu
     public void closeMenu()
     {
+        mode.currentMode = modes.IOT_MENU;
         isMenuOpen = false;
         menuContainer.GetComponent<RadialMenu>().closeOnDeactivate = true;
         menuContainer.GetComponent<RadialMenu>().DeactivateMenu();
@@ -168,8 +144,9 @@ public class IotMenu : MonoBehaviour
     }
 
 
-    void updateMenu()
+    public void updateMenu(Vector3 hand)
     {
+        Debug.Log(hand + " hand");
         double angle = circle.getAngle(hand);
 
         if(angle == 0)
@@ -181,11 +158,19 @@ public class IotMenu : MonoBehaviour
     }
     
     // finds which direction the user is moving their hand in
+    public void next()
+    {
+        script.m_SelectedIndex = normalizeIndex(script.m_SelectedIndex + 1);
+    }
+
+    public void back()
+    {
+        script.m_SelectedIndex = normalizeIndex(script.m_SelectedIndex - 1);
+    }
 
     void updateIndexFromAngle(double angle)
     {
         var index = (int)((360 - angle) / (360 / script.m_ButtonsNames.Length));
-
         if (index >= script.m_ButtonsNames.Length)
         {
             index = script.m_ButtonsNames.Length - 1;
@@ -194,8 +179,22 @@ public class IotMenu : MonoBehaviour
         {
             index = 0;
         }
-
         script.m_SelectedIndex = index;
+    }
+
+    int normalizeIndex(int index)
+    {
+        if(index < 0)
+        {
+            index += script.m_ButtonsNames.Length;
+        }
+
+        if(index >= script.m_ButtonsNames.Length)
+        {
+            index -= script.m_ButtonsNames.Length;
+        }
+
+        return index;
     }
 
     void resetMenu()

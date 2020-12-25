@@ -11,18 +11,22 @@ public class Gesture : MonoBehaviour
     private Body[] bodies;
 
     // Find the hand states
-    private string rightHandState = "-";
-    private string leftHandState = "-";
+    private P_HandState rightHandState = P_HandState.UNKOWN;
+    private P_HandState leftHandState = P_HandState.UNKOWN;
     private CameraSpacePoint posRight;
     private CameraSpacePoint posLeft;
 
-    public string RightHandState { get => rightHandState; set => rightHandState = value; }
-    public string LeftHandState { get => leftHandState; set => leftHandState = value; }
+    public P_HandState RightHandState { get => rightHandState; set => rightHandState = value; }
+    public P_HandState LeftHandState { get => leftHandState; set => leftHandState = value; }
     public CameraSpacePoint PosRight { get => posRight; set => posRight = value; }
     public CameraSpacePoint PosLeft { get => posLeft; set => posLeft = value; }
 
+
+    SwipingGesture swipe;
+
     void Start()
     {
+        swipe = new SwipingGesture();
         if (BodySrcManager == null)
         {
             Debug.LogError("no body source manager assigned");
@@ -31,6 +35,11 @@ public class Gesture : MonoBehaviour
         {
             bodyManager = BodySrcManager.GetComponent<BodySourceManager>();
         }
+    }
+   
+    public int getBodyCount()
+    {
+        return bodies.Length;
     }
 
     void Update()
@@ -54,35 +63,46 @@ public class Gesture : MonoBehaviour
 
             if (body.IsTracked)
             {
-                 PosLeft = body.Joints[JointType.HandLeft].Position;
-                 PosRight = body.Joints[JointType.HandRight].Position;
 
-                updateHandState(body.HandLeftState, false);
-                updateHandState(body.HandRightState, true);           
+                PosLeft = body.Joints[JointType.HandLeft].Position;
+                PosRight = body.Joints[JointType.HandRight].Position;
+
+                var leftElbow = body.Joints[JointType.ElbowLeft].Position;
+                var rightElbow = body.Joints[JointType.ElbowRight].Position;
+
+                if(PosLeft.Y >= leftElbow.Y)
+                {
+                    updateHandState(body.HandLeftState, false);
+                }
+
+                if(PosRight.Y >= rightElbow.Y)
+                {
+                    updateHandState(body.HandRightState, true);
+                }              
             }
         }
     }
 
     void updateHandState(HandState state, bool right)
     {
-        string output = "";
+        P_HandState output = P_HandState.UNKOWN;
 
         switch (state)
         {
             case HandState.Open:
-                output = "Open";
+                output = P_HandState.OPEN;
                 break;
             case HandState.Closed:
-                output = "Closed";
+                output = P_HandState.CLOSED;
                 break;
             case HandState.Lasso:
-                output = "Lasso";
+                output = P_HandState.LASSO;
                 break;
             case HandState.Unknown:
-                output = "Unknown...";
+                output = P_HandState.UNKOWN;
                 break;
             case HandState.NotTracked:
-                output = "Not tracked";
+                output = P_HandState.UNKOWN;
                 break;
             default:
                 break;

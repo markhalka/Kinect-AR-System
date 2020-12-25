@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 21031678818964279}
   - component: {fileID: 21031678818964277}
   - component: {fileID: 2241568483196641020}
-  - component: {fileID: -5843847729238366009}
+  - component: {fileID: -2132949725240498127}
   m_Layer: 0
   m_Name: Window
   m_TagString: Untagged
@@ -186,7 +186,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: -5843847729238366009}
+      - m_Target: {fileID: -2132949725240498127}
         m_MethodName: onButtonClick
         m_Mode: 1
         m_Arguments:
@@ -199,7 +199,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &-5843847729238366009
+--- !u!114 &-2132949725240498127
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -208,6 +208,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 21031678818964274}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3dba4aa4b7da6f84dba8161f54e6b75c, type: 3}
+  m_Script: {fileID: 11500000, guid: d246f1eb1f267fe4992874d07209f64d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

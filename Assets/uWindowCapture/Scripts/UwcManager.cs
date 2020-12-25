@@ -172,7 +172,6 @@ public class UwcManager : MonoBehaviour
     void UpdateWindowInfo()
     {
         cursorWindowId_ = Lib.GetWindowIdUnderCursor();
-            Debug.LogError(cursorWindowId_ + " window id");
     }
 
     UwcWindow AddWindow(int id)

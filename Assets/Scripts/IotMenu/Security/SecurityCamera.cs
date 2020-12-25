@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Camera 
+public class SecurityCamera 
 {
         public string ip;
         public string name;
