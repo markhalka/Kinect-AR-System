@@ -1941,8 +1941,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1951aa67453c3d84189494eb997a6c08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selected: {r: 1, g: 1, b: 1, a: 0.5019608}
-  notSelected: {r: 0, g: 0, b: 0, a: 0.5019608}
+  selected: {r: 0, g: 0, b: 0, a: 0}
+  notSelected: {r: 0, g: 0, b: 0, a: 0}
   icon: {fileID: 115657775}
   title: {fileID: 2098169781}
   x: {fileID: 1611516120}
@@ -2754,11 +2754,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetSurfaceLayers:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 1
   renderUserView: 1
-  userViewShader: {fileID: 4800000, guid: 4ce1f15d3e6e0d949b97cdae6709bc96, type: 3}
+  userViewShader: {fileID: 0}
   renderProjectionPass: 1
-  projectionShader: {fileID: 4800000, guid: fa033eb842b03054d9bb09f39fd6ac4a, type: 3}
+  projectionShader: {fileID: 0}
 --- !u!114 &883561005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2773,11 +2773,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetSurfaceLayers:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 1
   renderUserView: 1
-  userViewShader: {fileID: 4800000, guid: 6069b44013ae11a4f92c34a8d9014537, type: 3}
+  userViewShader: {fileID: 0}
   renderProjectionPass: 1
-  projectionShader: {fileID: 4800000, guid: c44291e07a8c3ef4b8b988d79f5c8447, type: 3}
+  projectionShader: {fileID: 0}
 --- !u!114 &883561006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2790,21 +2790,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 804ad38e3d02cb1458dafe222531df30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectionManager: {fileID: 1171602173}
+  projectionManager: {fileID: 0}
   targetRGBTexture: {fileID: 0}
   fieldOfView: 90
   nearClippingPlane: 0.1
   farClippingPlane: 8
   virtualObjectsMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 0
   debugPlane: 1
   debugPlaneSize: 0.1
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
   realSurfaceColor: {r: 0, g: 0, b: 0, a: 0}
-  projectionLayers:
-  - {fileID: 883561005}
-  - {fileID: 883561004}
+  projectionLayers: []
 --- !u!114 &883561007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2817,7 +2815,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94bbca82b1e75294796f0bb8aaa0dbe2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonProvider: {fileID: 1134679134}
+  skeletonProvider: {fileID: 0}
   skeletonID: 0
   updateFromKinect: 1
   lookAt: {fileID: 0}
@@ -2956,10 +2954,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showSkeletons: 1
-  calibrationData: {fileID: 1171602176}
+  calibrationData: {fileID: 0}
   nameInConfiguration: 0
   localCalibrationFilename: 
-  calibrationLoaded: 1
+  calibrationLoaded: 0
   serverIPAddress: localhost
   StreamDepth: 1
   StreamColor: 1
@@ -2974,58 +2972,58 @@ MonoBehaviour:
   DepthTexture: {fileID: 0}
   RGBTexture: {fileID: 0}
   RGB_Intrinsics:
-    e00: 1059.4272
+    e00: 0
     e01: 0
     e02: 0
     e03: 0
     e10: 0
-    e11: 1061.059
+    e11: 0
     e12: 0
     e13: 0
-    e20: 971.3443
-    e21: 538.2
-    e22: 1
+    e20: 0
+    e21: 0
+    e22: 0
     e23: 0
     e30: 0
     e31: 0
     e32: 0
     e33: 0
   RGB_Extrinsics:
-    e00: 0.99999785
-    e01: 0.0012342229
-    e02: -0.0016757344
-    e03: 0.05251273
-    e10: -0.0012299314
-    e11: 0.99999595
-    e12: 0.002580936
-    e13: -0.00010013774
-    e20: 0.0016788935
-    e21: -0.0025788797
-    e22: 0.9999953
-    e23: -0.00002869606
-    e30: 0
-    e31: 0
-    e32: 0
-    e33: 1
-  IR_Intrinsics:
-    e00: 366.84048
+    e00: 0
     e01: 0
     e02: 0
     e03: 0
     e10: 0
-    e11: 366.8707
+    e11: 0
     e12: 0
     e13: 0
-    e20: 261.48505
-    e21: 227.30147
-    e22: 1
+    e20: 0
+    e21: 0
+    e22: 0
     e23: 0
     e30: 0
     e31: 0
     e32: 0
     e33: 0
-  RGB_DistCoef: {x: 0.017848233, y: -0.002669459, z: 0, w: 0}
-  IR_DistCoef: {x: 0.055486687, y: -0.1605421, z: 0, w: 0}
+  IR_Intrinsics:
+    e00: 0
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 0
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 0
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 0
+  RGB_DistCoef: {x: 0, y: 0, z: 0, w: 0}
+  IR_DistCoef: {x: 0, y: 0, z: 0, w: 0}
   audioClip: {fileID: 0}
   playbackController: {fileID: 0}
 --- !u!4 &1134679135
@@ -3088,7 +3086,7 @@ MonoBehaviour:
     height: 1
   textureLayers:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   renderOnlyTextures: 0
 --- !u!114 &1171602175
 MonoBehaviour:
@@ -3102,8 +3100,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba248269ae6a971429fa9add8fb481a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  kinectModel: {fileID: 100002, guid: 6e0f4c376ca6bff49907dff8600c9f9b, type: 3}
-  projectorModel: {fileID: 100002, guid: a8ecc048fc20b654f844115df13af80e, type: 3}
+  kinectModel: {fileID: 0}
+  projectorModel: {fileID: 0}
 --- !u!114 &1171602176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3116,7 +3114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54e474a03a241db4c99794a07418ace7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  calibration: {fileID: 4900000, guid: 33112e69e5bbe1c478fd062857d1b227, type: 3}
+  calibration: {fileID: 0}
 --- !u!4 &1171602177
 Transform:
   m_ObjectHideFlags: 0
@@ -3452,7 +3450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6ac1d9dfc03ea489ae5993c06c1d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  kinectClient: {fileID: 1134679134}
+  kinectClient: {fileID: 0}
   surfaceMaterial: {fileID: 0}
   depthTexture: {fileID: 0}
   rgbTexture: {fileID: 0}
@@ -3973,13 +3971,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05a51e3443c481d49be475d40bbe79bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  calibrationData: {fileID: 1171602176}
+  calibrationData: {fileID: 0}
   nameInConfiguration: 0
-  projectionManager: {fileID: 1171602173}
+  projectionManager: {fileID: 0}
   lensDist: {x: 0, y: 0, z: 0, w: 0}
-  imageWidth: 1920
-  imageHeight: 1080
-  displayIndex: 1
+  imageWidth: 1280
+  imageHeight: 800
+  displayIndex: -1
 --- !u!20 &1727432245
 Camera:
   m_ObjectHideFlags: 0
@@ -4240,7 +4238,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1890290921}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d246f1eb1f267fe4992874d07209f64d, type: 3}
   m_Name: 

@@ -53,11 +53,11 @@ public class Main : MonoBehaviour
         {
             if (gesture.getBodyCount() > 1)
             {
-                WindowManager.hideSafeWindows();
+                windowMenu.hideSafeWindows();
             }
             else
             {
-                WindowManager.showSafeWindows();
+                windowMenu.showSafeWindows();
             }
         }
 

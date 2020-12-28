@@ -12,7 +12,14 @@ public class Window : MonoBehaviour
 {
 
     int processId = 0;
+    public int id { get; set; }
     bool safeMode = false;
+
+    public void Start()
+    {
+        id = WindowMenu.windowIds++;
+        gameObject.transform.GetChild(0).GetComponentInChildren<TMPro.TMP_Text>().text = id.ToString();
+    }
 
     public void setSafeMode(bool mode)
     {

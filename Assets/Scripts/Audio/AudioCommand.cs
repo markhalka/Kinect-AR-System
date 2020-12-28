@@ -27,10 +27,12 @@ public class AudioCommand : MonoBehaviour
     public GameObject commandHandlerGb;
     CommandHandler commandHandler;
 
+   
+
     string[] phrases = new string[] {"open menu","close menu","select",
         "open window", "close window", "select", "up","down","forward","back","next",
     "delete","minimize","maximize","grow","shrink","show cursor","hide cursor",
-        "safe mode on","safe mode off", "show safe windows", "hide safe windows"};
+        "safe mode on","safe mode off", "show safe windows", "hide safe windows", "show id", "hide id"};
 
 
     public void Start()
@@ -46,6 +48,8 @@ public class AudioCommand : MonoBehaviour
     }
 
 
+
+
     public void initPhraseList()
     {
         var phraseList = PhraseListGrammar.FromRecognizer(recognizer);
@@ -53,9 +57,80 @@ public class AudioCommand : MonoBehaviour
         {
             phraseList.AddPhrase(i);
         }
+
+        foreach(string i in addNumbers())
+        {
+            phraseList.AddPhrase(i);
+        }
+
+        foreach(string i in addPercents())
+        {
+            phraseList.AddPhrase(i);
+        }
+
+        foreach(string i in addMenuOptions())
+        {
+            phraseList.AddPhrase(i);
+        }
     }
 
-    public async void ButtonClick()
+    string[] addNumbers()
+    {
+        List<string> output = new List<string>();
+        for(int i = 1; i < 21; i++)
+        {
+            output.Add(i.ToString());
+        }
+        return output.ToArray();
+    }
+
+    string[] addPercents()
+    {
+        List<string> output = new List<string>();
+        for(int i = 10; i <= 200; i += 10)
+        {
+            output.Add(i.ToString() + " percent");
+        }
+        return output.ToArray();
+    }
+
+    string[] addMenuOptions()
+    {
+        List<string> output = new List<string>();
+        MenuOption start = new Home();
+
+        LinkedList<MenuOption> queue = new LinkedList<MenuOption>();
+
+
+        output.Add(start.name);
+        queue.AddLast(start);
+
+        while (queue.Count > 0)
+        {
+
+            MenuOption s = queue.First.Value;
+            queue.RemoveFirst();
+
+            if(s.submenus == null)
+            {
+                continue;
+            }
+
+            foreach (var menu in s.submenus)
+            {
+                if (!output.Contains(menu.name))
+                {
+                    output.Add(menu.name);
+                    queue.AddLast(menu);
+                }
+            }
+        }
+
+        return output.ToArray();
+    }
+
+
+public async void ButtonClick()
     {
         lock (threadLocker)
         {
@@ -107,6 +182,9 @@ public class AudioCommand : MonoBehaviour
         audioCommands.Add("show cursor", delegate { commandHandler.showCursor(); });
         audioCommands.Add("hide cursor", delegate { commandHandler.hideCursor(); });
 
+        audioCommands.Add("show id", delegate { commandHandler.showIds(); });
+        audioCommands.Add("hide id", delegate { commandHandler.hideIds(); });
+
         //all of these only work if a window is currently selected
         audioCommands.Add("delete", delegate { commandHandler.delete(); });
         audioCommands.Add("grow", delegate { commandHandler.grow(); }); //each by 10%
@@ -134,15 +212,89 @@ public class AudioCommand : MonoBehaviour
 
         command = sb.ToString().Trim();
 
-        Debug.LogError("after parsed: " + command);
+        Debug.LogError(command + " command");
+
         if (audioCommands.ContainsKey(command))
         {
             Debug.LogError("found in audio commands, executing...");
             audioCommands[command].Invoke();
         } else
         {
+            parseComplex(command);
+        }
+    }
+
+    //there are all commands that are more complex and need further parsing
+    void parseComplex(string command)
+    {
+        var split = command.Split();
+        if (command.Contains("select"))
+        {
+            if(split.Length != 2)
+            {
+                commandHandler.audioError();
+                return;
+            }
+
+            if (mode.currentMode == modes.IOT_MENU)
+            {
+                commandHandler.selectIotName(split[1]);
+            }
+            else if (mode.currentMode == modes.NONE)
+            {
+                int id;
+                if (split.Length == 2 && int.TryParse(split[1], out id))
+                {
+                    bool outcome  = commandHandler.selectId(id);
+                    if (!outcome)
+                    {
+                        commandHandler.commandError();
+                    }
+                    else
+                    {
+                        commandHandler.completed();
+                    }
+                }
+            }
+
+        } else if(command.Contains("grow") || command.Contains("shrink")){
+            if(split.Length == 3)
+            {
+                int percent = getPercent(split[1], split[2]);
+                //then check that it is valid, and grow/shrink it by that percent 
+                if(WindowManager.currentWindow == null)
+                {
+                    commandHandler.selectError();
+                }
+                var window = WindowManager.currentWindow.GetComponent<Window>();
+                if (command.Contains("grow"))
+                {
+                    WindowManager.resizeWindow(window, percent);
+                } else
+                {
+                    WindowManager.resizeWindow(window, -percent);
+                }
+            }
+
+        } else
+        {
             commandHandler.audioError();
         }
+    }
+
+    int getPercent(string a, string b)
+    {
+        if(b.Trim() != "percent")
+        {
+            return 0;
+        }
+
+        int output = 0;
+        if(!int.TryParse(a, out output))
+        {
+            return 0;
+        }
+        return output;
     }
 
     public void Update()

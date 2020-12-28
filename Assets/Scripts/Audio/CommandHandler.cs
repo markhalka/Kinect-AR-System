@@ -177,12 +177,12 @@ public class CommandHandler : MonoBehaviour
 
     public void showSafeWindows()
     {
-        WindowManager.showSafeWindows();
+        windowMenu.showSafeWindows();
     }
 
     public void hideSafeWindows()
     {
-        WindowManager.hideSafeWindows();
+        windowMenu.hideSafeWindows();
     }
 
     public void select()
@@ -223,6 +223,26 @@ public class CommandHandler : MonoBehaviour
     {
         source.clip = completedSound;
         source.Play();
+    }
+
+    public void showIds()
+    {
+        windowMenu.toggleIds(true);
+    }
+
+    public void hideIds()
+    {
+        windowMenu.toggleIds(false);
+    }
+
+    public void selectIotName(string name)
+    {
+        iotMenu.selectOption(name);
+    }
+
+    public bool selectId(int id)
+    {
+        return windowMenu.selectId(id);
     }
 }
 

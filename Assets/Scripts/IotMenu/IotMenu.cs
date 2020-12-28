@@ -136,7 +136,7 @@ public class IotMenu : MonoBehaviour
     //closes the current menu
     public void closeMenu()
     {
-        mode.currentMode = modes.IOT_MENU;
+        mode.currentMode = modes.NONE;
         isMenuOpen = false;
         menuContainer.GetComponent<RadialMenu>().closeOnDeactivate = true;
         menuContainer.GetComponent<RadialMenu>().DeactivateMenu();
@@ -207,6 +207,23 @@ public class IotMenu : MonoBehaviour
     {
         handleMenuUpdate(script.m_ButtonsNames[script.m_SelectedIndex]);
         resetMenu();
+    }
+
+    public void selectOption(string option)
+    {
+        if(currentOption.submenus == null)
+        {
+            Debug.LogError("cannot select option because there are none");
+            return;
+        }
+
+        foreach(var menuOption in currentOption.submenus)
+        {
+            if(option.ToLower() == menuOption.name.ToLower())
+            {
+                handleMenuUpdate(menuOption.name);
+            }
+        }
     }
 
     public void handleKeyboard()

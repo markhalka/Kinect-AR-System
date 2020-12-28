@@ -11,8 +11,6 @@ public class WindowManager : MonoBehaviour
     public static bool safeMode = false;
     public static GameObject currentWindow;
 
-    [SerializeField]
-    public static GameObject windowList; //not sure if that would work...
 
     public GameObject handObject;
 
@@ -22,8 +20,7 @@ public class WindowManager : MonoBehaviour
 
     public enum safeWindowState { HIDDEN, SHOWN, PARTIAL };
     public static safeWindowState safeState = safeWindowState.SHOWN;
-
- //   static List<Window> windows;
+    //   static List<Window> windows;
 
 
     #region maximize Windows
@@ -148,18 +145,6 @@ public class WindowManager : MonoBehaviour
     #endregion
 
 
-    public static void hideWindow(Window window)
-    {
-        window.gameObject.SetActive(false);
-        //  WindowManager.MinimizeWindow(processId);
-    }
-
-    public static void showWindow(Window window)
-    {
-        window.gameObject.SetActive(true);
-        // WindowManager.MaximizeWindow(processId);
-    }
-
     public static void destroyWindow(GameObject window)
     {
         if (window != null)
@@ -213,41 +198,6 @@ public class WindowManager : MonoBehaviour
         }
     }
 
-
-    public static void showSafeWindows()
-    {
-        if (safeState == safeWindowState.SHOWN)
-        {
-            return;
-        }
-
-        foreach (Window w in windowList.GetComponentsInChildren<Window>())
-        {
-            if (w.getSafeMode())
-            {
-                showWindow(w);
-            }
-        }
-
-        safeState = safeWindowState.SHOWN;
-    }
-
-    public static void hideSafeWindows()
-    {
-        if (safeState == safeWindowState.HIDDEN)
-        {
-            return;
-        }
-
-        foreach (Window w in windowList.GetComponentsInChildren<Window>())
-        {
-            if (w.getSafeMode())
-            {
-                hideWindow(w);
-            }
-        }
-        safeState = safeWindowState.HIDDEN;
-    }
 
     public static void destroyCurrentWindow()
     {

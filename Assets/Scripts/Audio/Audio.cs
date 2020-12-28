@@ -14,7 +14,7 @@ public class Audio : MonoBehaviour
 
     public void Update()
     {
-        didSnap();   
+      //  didSnap();   
     }
 
     void OnApplicationPause(bool pauseStatus)
