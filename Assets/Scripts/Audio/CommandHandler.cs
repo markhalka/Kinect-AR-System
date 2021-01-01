@@ -8,6 +8,7 @@ public class CommandHandler : MonoBehaviour
     public GameObject IotMenuGb;
     public GameObject windowMenuGb;
     public GameObject handObjectGb;
+    public GameObject calanderImage;
 
     WindowMenu windowMenu;
     HandObject handObject;
@@ -243,6 +244,11 @@ public class CommandHandler : MonoBehaviour
     public bool selectId(int id)
     {
         return windowMenu.selectId(id);
+    }
+
+    public void calendar()
+    {
+        calanderImage.SetActive(true);
     }
 }
 

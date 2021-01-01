@@ -40,11 +40,11 @@ public class RadialLayout : LayoutGroup
 	{ 
 		CalculateRadial();
 	}
-	protected override void OnValidate()
+	/*protected override void OnValidate()
 	{
 		base.OnValidate();
 		CalculateRadial();
-	}
+	} */
 
     public void UpdateFDistance( float fdist )
     {

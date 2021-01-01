@@ -18,7 +18,9 @@ public class Window : MonoBehaviour
     public void Start()
     {
         id = WindowMenu.windowIds++;
-        gameObject.transform.GetChild(0).GetComponentInChildren<TMPro.TMP_Text>().text = id.ToString();
+        var textObj = gameObject.transform.GetChild(0).GetComponentInChildren<TMPro.TMP_Text>();
+        textObj.text = id.ToString();
+        textObj.gameObject.SetActive(false);
     }
 
     public void setSafeMode(bool mode)

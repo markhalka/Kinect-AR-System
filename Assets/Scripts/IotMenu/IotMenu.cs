@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Windows.Kinect;
 using System;
 using System.Globalization;
+using UnityEngine.Video;
 
 
 // todo for this shit:
@@ -20,7 +21,6 @@ public class IotMenu : MonoBehaviour
     public GameObject menuContainer;
     public bool isMenuOpen = false;
     public static string buttonCall;
-    public Circle circle;
 
     RadialMenu script;
     MenuOption home;
@@ -29,7 +29,6 @@ public class IotMenu : MonoBehaviour
         script = menuContainer.GetComponent<RadialMenu>();
         buttonCall = "";
         isMenuOpen = false;
-        circle = new Circle();
         home = new Home();
         currentOption = home;
         getSubMenuNames(home);
@@ -45,15 +44,14 @@ public class IotMenu : MonoBehaviour
         handleKeyboard();
     }
 
-
-    //  public enum menus {Home, Security, IOT, Settings, Effects };
-    //  public menus currentMenu;
-
-    //ok, so instead button call will invoke the current handle method on the current menu, and then that will decide the next option
-
     MenuOption currentOption;
+    public GameObject thermostat;
+    public GameObject video;
     public void handleMenuUpdate(string menuName)
     {
+
+
+
         currentOption = getOptionFromName(menuName);
         var options = getSubMenuNames(currentOption);
         if(options.Length == 0)
@@ -82,6 +80,11 @@ public class IotMenu : MonoBehaviour
 
     public MenuOption getOptionFromName(string name)
     {
+        if(currentOption.submenus == null)
+        {
+            return null;
+        }
+
         foreach(MenuOption option in currentOption.submenus)
         {
             if (option.name == name)
@@ -140,21 +143,39 @@ public class IotMenu : MonoBehaviour
         isMenuOpen = false;
         menuContainer.GetComponent<RadialMenu>().closeOnDeactivate = true;
         menuContainer.GetComponent<RadialMenu>().DeactivateMenu();
-        resetMenu();
+        currAngle = 0;
     }
 
-
+    Vector3 prev = new Vector3(0, 0, 0);
+    double currAngle = 0;
+    double sensitivity = 20f;
     public void updateMenu(Vector3 hand)
     {
-        Debug.Log(hand + " hand");
-        double angle = circle.getAngle(hand);
-
-        if(angle == 0)
+        if(prev == new Vector3(0, 0, 0))
         {
+            prev = hand;
             return;
         }
 
-        updateIndexFromAngle(angle);
+        var dot = Vector3.Dot(hand, prev);
+        var det = hand.x * prev.y - hand.y * prev.x;
+        var angle = Mathf.Rad2Deg * Math.Atan2(det, dot) * sensitivity;
+
+        currAngle += angle;
+
+        if (currAngle < 0)
+        {
+            currAngle += 360;
+        }
+
+        if(currAngle > 360)
+        {
+            currAngle -= 360;
+        }
+
+        updateIndexFromAngle(currAngle);
+
+        prev = hand;
     }
     
     // finds which direction the user is moving their hand in
@@ -197,16 +218,11 @@ public class IotMenu : MonoBehaviour
         return index;
     }
 
-    void resetMenu()
-    {
-        circle.resetCircle();
-    }
-
 
     public void selectOption()
     {
         handleMenuUpdate(script.m_ButtonsNames[script.m_SelectedIndex]);
-        resetMenu();
+        currAngle = 0;
     }
 
     public void selectOption(string option)

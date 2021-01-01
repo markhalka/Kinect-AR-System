@@ -11,7 +11,6 @@ public class WindowMenu : MonoBehaviour
     public GameObject openObject;
     public static Window window;
 
-
     Vector3 pastMenuPosition = new Vector3(0, 0);
     float minDistanceY = 0.1f;
     int menuIndex = 0;
@@ -118,6 +117,8 @@ public class WindowMenu : MonoBehaviour
     {
         windowList.transform.GetChild(menuIndex).GetComponent<Button>().onClick.Invoke();
         WindowManager.safeState = WindowManager.safeWindowState.PARTIAL;
+        
+
     }
 
     public void createMenu()
@@ -149,6 +150,7 @@ public class WindowMenu : MonoBehaviour
     {
         foreach (var text in windowList.GetComponentsInChildren<TMPro.TMP_Text>())
         {
+            Debug.LogError("setting to: " + show);
             text.gameObject.SetActive(show);
         }
     }

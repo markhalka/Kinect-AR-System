@@ -18,7 +18,7 @@ class RightHand : Hand
 
     public override void update()
     {
-        if (menu_count > HAND_THRESH && currentState != P_HandState.CLOSED)
+         if (menu_count > HAND_THRESH && currentState != P_HandState.CLOSED)
         {
             if (mode.currentMode != modes.SELECT)
             {
@@ -35,37 +35,6 @@ class RightHand : Hand
 
     public override void updateLasso()
     {
-       /* if (currentState == "Lasso" && canMove)
-        {
-            if (mode.currentMode == modes.MENU && window.currentWindow == null)
-            {
-                windowMenu.selectMenuOption();
-                mode.currentMode = modes.NONE;
-                updateState();
-                return;
-            }
-            else
-            {
-                if (mode.currentMode != modes.SELECT)
-                {
-                    mode.currentMode = modes.SELECT;
-                    updateState();
-                }
-                else
-                {
-                    if (window.currentWindow == null)
-                    {
-                        window.selectWindow();
-                    }
-                    else
-                    {
-                        RightHandObject.SetActive(false);
-                        mode.currentMode = modes.NONE;
-                        updateState();
-                    }
-                }
-            }
-        }*/
     }
 
     const float MENU_THRESH = 2;
@@ -96,7 +65,7 @@ class RightHand : Hand
         }
     }
 
-    int count = 0;
+
     public override void updateSwipe()
     {
         if (mode.currentMode == modes.SELECT && canMove)
@@ -114,14 +83,4 @@ class RightHand : Hand
             }
         }
     }
-
-    /*
-     *  if (mode.currentMode == modes.SELECT)
-            {
-                windowMenu.destroyCurrentWindow();
-                mode.currentMode = modes.NONE;
-                updateState();
-                return;
-            }
-     */
 }

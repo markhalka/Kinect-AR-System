@@ -70,14 +70,6 @@ public class RadialMenu : MonoBehaviour
     {
         closeOnDeactivate = true;
 
-    /*    for (int i = 0; i < 6; i++)
-        {
-            m_Buttons.Add(CreateNewButton());
-        }*/
-
-
-        //string[] testMenu = new string[] { "0", "1", "2"};
-      //  GenerateMenu("Fire particles", testMenu);
 	}
 
     void Update()
@@ -113,10 +105,6 @@ public class RadialMenu : MonoBehaviour
                 m_OptionSelected = true;
             }
 
-           /* if (Input.GetMouseButtonUp(0))
-                DeactivateMenu();*/
-
-           
         }
         else if (m_State == State.Deactivating )
         {
@@ -139,34 +127,6 @@ public class RadialMenu : MonoBehaviour
             gameObject.SetActive(false);
         }
 
-     /*
-
-        if (Mathf.Abs(m_RadLayout.fDistance - m_TargetDistance) > .5f)
-        {
-            m_RadLayout.UpdateFDistance(Mathf.Lerp(m_RadLayout.fDistance, m_TargetDistance, Time.deltaTime * 4));
-        }
-        else
-            m_RadLayout.UpdateFDistance(m_TargetDistance);
-      * */
-            
-    }
-
-   /* int FindClosestButtonIndex()
-    {
-        int closestButtonIndex = 0;
-        float closestDist = float.MaxValue;
-        for (int i = 0; i < m_ButtonsNames.Length; i++)
-        {
-            float dist = Vector3.Distance(Input.mousePosition, m_Buttons[i].transform.position);
-            if( dist < closestDist )
-            {
-                closestDist = dist;
-                closestButtonIndex = i;
-            }
-        }
-
-        return closestButtonIndex;
-    }*/
 
     void SetButtonFade( float fade )
     {
@@ -228,18 +188,14 @@ public class RadialMenu : MonoBehaviour
         m_RadLayout.transform.localPosition = Vector3.zero;
         m_RadLayout.MaxAngle = m_AngleRange;
         m_RadLayout.StartAngle = m_StartAngle;
+        m_RadLayout.transform.localScale = new Vector3(1, 1, 1);
 
         int index = m_RadLayout.transform.GetSiblingIndex();
         m_RadLayout.transform.SetSiblingIndex(index - 1);
         initialized = true;
     }
 
-   /* public void OnPointerDown(PointerEventData eventData)
-    {
-        ActivateMenu();
-        Debug.Log(this.gameObject.name + " Was Clicked.");
-    }
-    */
+
     public void ActivateMenu()
     {
         print("Menu activated");
@@ -252,7 +208,7 @@ public class RadialMenu : MonoBehaviour
         m_State = State.Activating;
 
         
-        m_TargetDistance = 150;
+        m_TargetDistance = 250;
         m_Active = true;
 
     }
@@ -277,7 +233,7 @@ public class RadialMenu : MonoBehaviour
         Button newBtn = Instantiate(m_ButtonPrefab) as Button;
         newBtn.transform.SetParent(m_RadLayout.transform);
         newBtn.gameObject.SetActive(false);
-
+        newBtn.transform.localScale = new Vector3(2f, 2f, 2f);
         newBtn.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_ButtonSize);
         newBtn.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, m_ButtonSize);
 

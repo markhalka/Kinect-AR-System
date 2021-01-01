@@ -6,7 +6,7 @@ public class ViewCameras : MenuOption
 {
     public ViewCameras() : base("View Cameras")
     {
-
+        submenus = new List<MenuOption>(new MenuOption[] { new BackDoorCam(), new KitchenCam(), new FrontDoorCam(), new BasementCam(), new MasterBedroom() });
     }
 
     public void openCamera()

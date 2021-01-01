@@ -21,9 +21,12 @@ public class AudioCommand : MonoBehaviour
     private string message;
 
     private bool micPermissionGranted = false;
+    private bool recognitionStarted = false;
 
     SpeechConfig config = SpeechConfig.FromSubscription("6f107236326042baaee35121c20a673f", "eastus");
     SpeechRecognizer recognizer;
+    TaskCompletionSource<int> stopRecognition = new TaskCompletionSource<int>();
+
     public GameObject commandHandlerGb;
     CommandHandler commandHandler;
 
@@ -32,7 +35,7 @@ public class AudioCommand : MonoBehaviour
     string[] phrases = new string[] {"open menu","close menu","select",
         "open window", "close window", "select", "up","down","forward","back","next",
     "delete","minimize","maximize","grow","shrink","show cursor","hide cursor",
-        "safe mode on","safe mode off", "show safe windows", "hide safe windows", "show id", "hide id"};
+        "safe mode on","safe mode off", "show safe windows", "hide safe windows", "show id", "hide id", "show calendar"};
 
 
     public void Start()
@@ -44,10 +47,53 @@ public class AudioCommand : MonoBehaviour
         initAudioCommands();
         micPermissionGranted = true;
         message = "";
-        startRecoButton.onClick.AddListener(ButtonClick);
+   
+    //    startRecoButton.onClick.AddListener(ButtonClick2);//(ButtonClick);
+        recognizer.Recognized += RecognizingHandler;
+        ButtonClick2();
+    }
+
+    private void RecognizingHandler(object sender, SpeechRecognitionEventArgs e)
+    {
+        lock (threadLocker)
+        {
+            message = e.Result.Text;
+        }
     }
 
 
+
+    public async void ButtonClick2()
+    {
+        if (recognitionStarted)
+        {
+            await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
+            lock (threadLocker)
+            {
+                recognitionStarted = false;
+            }
+        }
+        else
+        {
+            await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
+            lock (threadLocker)
+            {
+                recognitionStarted = true;
+            }
+        }
+    }
+
+
+    void Disable()
+    {
+        recognizer.Recognizing -= RecognizingHandler;
+        recognizer.Dispose();
+    }
+
+    private void OnDestroy()
+    {
+        Disable();
+    }
 
 
     public void initPhraseList()
@@ -130,40 +176,6 @@ public class AudioCommand : MonoBehaviour
     }
 
 
-public async void ButtonClick()
-    {
-        lock (threadLocker)
-        {
-            waitingForReco = true;
-        }
-
-        var result = await recognizer.RecognizeOnceAsync().ConfigureAwait(false);
-
-        string newMessage = string.Empty;
-        if (result.Reason == ResultReason.RecognizedSpeech)
-        {
-            newMessage = result.Text;
-        }
-        else if (result.Reason == ResultReason.NoMatch)
-        {
-            newMessage = "NOMATCH: Speech could not be recognized.";
-        }
-        else if (result.Reason == ResultReason.Canceled)
-        {
-            var cancellation = CancellationDetails.FromResult(result);
-            newMessage = $"CANCELED: Reason={cancellation.Reason} ErrorDetails={cancellation.ErrorDetails}";
-        }
-
-        lock (threadLocker)
-        {
-            message = newMessage;
-            waitingForReco = false;
-        }
-    }
-    
-
-
-
     Dictionary<string, Action> audioCommands = new Dictionary<string, Action>();
 
 
@@ -197,6 +209,8 @@ public async void ButtonClick()
         audioCommands.Add("hide safe windows", delegate { commandHandler.hideSafeWindows(); });
 
         audioCommands.Add("select", delegate { commandHandler.select(); });
+
+        audioCommands.Add("show calendar", delegate { commandHandler.calendar(); });
     }
 
     void parseMessages(string command)
@@ -314,6 +328,5 @@ public async void ButtonClick()
            
         }
     }
-
 }
 

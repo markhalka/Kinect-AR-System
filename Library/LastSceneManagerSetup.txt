@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/uWindowCapture/Examples/Window List/Window List.unity
+- path: Assets/Scenes/Window List.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0
