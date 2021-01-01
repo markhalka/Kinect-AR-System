@@ -8,6 +8,8 @@ precious real-estate on your desk. Third, it gives you more freedom in terms of 
 standing up. With Proton, there is little to know adjustmant required. There is no need to find a place to place my monitors, or find a surface for my mouse to avoid hunching over,
 you can simply use it identical as to when you are sitting. The intuitive controls make it easy to use (more on that below), and the option of voice commands make it even easier.
 
+<b>For a quick demo, check out the youtube video: https://youtu.be/-rruIseN1SM</b>
+
 ## Setup Instructions
 1. Download the project as a zip file, and open it in Unity
 2. Build it onto whatever platform you like
