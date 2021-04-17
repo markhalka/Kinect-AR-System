@@ -5,7 +5,7 @@ advantages to using Proton instead.
 
 First, bigger is better, and its hard to beat the size of a projector. Second, the system allows you to use any empty or unused space in your room, rather than taking up
 precious real-estate on your desk. Third, it gives you more freedom in terms of where and how you work. Often, I like to switch between working sitting down or 
-standing up. With Proton, there is little to know adjustmant required. There is no need to find a place to place my monitors, or find a surface for my mouse to avoid hunching over,
+standing up. With Proton, there is little to no adjustmant required. There is no need to find a place to place my monitors, or find a surface for my mouse to avoid hunching over,
 you can simply use it identical as to when you are sitting. The intuitive controls make it easy to use (more on that below), and the option of voice commands make it even easier.
 
 <b>For a quick demo, check out the youtube video: https://youtu.be/-rruIseN1SM</b>
